@@ -1,13 +1,22 @@
-import React, { useState, useEffect,useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // import logo from './logo.svg';
 import Panel from './components/Panel';
 import './App.css';
 
+
+
 function App() {
 
+    const gameRule = useRef([
+        '如果活細胞周圍八個位置的活細胞少於兩個，則該位置細胞死亡',
+        '如果活細胞周圍八個位置有兩個或三個活細胞，則該位置細胞存活',
+        '如果活細胞周圍八個位置有超過三個活細胞，則該位置活細胞死亡',
+        '如果死細胞周圍正好有三個活細胞，則該位置細胞復活'
+    ]);
+
     const [settings, setSettings] = useState({
-        rows: 50,
-        cols: 50,
+        rows: 10,
+        cols: 10,
         update_mSec: 1000,
         init_cell_number: 3,
         generation: 0
@@ -18,7 +27,7 @@ function App() {
     let id = null;
     const MAX_COUNT = 1000;
 
-    const startPlay = useCallback(() => {
+    const startPlay = () => {
 
         if (!startGenerationRef.current) return;
 
@@ -29,7 +38,7 @@ function App() {
 
         setTimeout(startPlay, settings.update_mSec);
 
-    }, [settings.generation]);
+    };
 
     useEffect(() => {
         console.log('settings.generation',settings.generation);
@@ -38,9 +47,17 @@ function App() {
 
     return (
         <div className="App">
+            <h1>Conway's Game of Live</h1>
+
+            <h3>Rule</h3>
+
+            {gameRule.current.map(r => <p key={r}>{r}</p>)}
+
             <header style={ {
                 position: 'relative',
-                margin: '0 20%'
+                maxWidth: '50%',
+                maxHeight: '50%',
+                margin: '0 auto',
             } }>
                 {console.log('render header')}
                 <Panel {...settings} />
