@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback, useRef } from 'react';
 // import logo from './logo.svg';
-import Pannel from './components/Pannel';
+import Panel from './components/Panel';
 import './App.css';
 
 function App() {
@@ -13,23 +13,28 @@ function App() {
         generation: 0
     });
 
-    const [startGeneration, setStartGeneration] = useState(false);
+    const startGenerationRef = useRef(false);
 
     let id = null;
+    const MAX_COUNT = 1000;
+
+    const startPlay = useCallback(() => {
+
+        if (!startGenerationRef.current) return;
+
+        if (settings.generation > MAX_COUNT) clearTimeout(id);
+
+        console.log('startPlay -> settings', settings);
+        setSettings(prev => ({...prev, generation: prev.generation + 1}));
+
+        setTimeout(startPlay, settings.update_mSec);
+
+    }, [settings.generation]);
 
     useEffect(() => {
-        if (!startGeneration) return;
-        console.log('App -> startGeneration', startGeneration);
+        console.log('settings.generation',settings.generation);
+    },[settings]);
 
-        clearInterval(id);
-
-        id = setInterval(() => {
-            setSettings({...settings, generation: settings.generation + 1});
-        }, settings.update_mSec);
-
-        return () => clearInterval(id);
-
-    }, [startGeneration]);
 
     return (
         <div className="App">
@@ -38,7 +43,7 @@ function App() {
                 margin: '0 20%'
             } }>
                 {console.log('render header')}
-                <Pannel {...settings} />
+                <Panel {...settings} />
             </header>
 
             { JSON.stringify(settings)}
@@ -56,8 +61,8 @@ function App() {
 
                     <label htmlFor='initialNumberOfCells'>Initial Number Of Cells</label>
                     <input type="number" name="initialNumberOfCells" placeholder=" initial number of cells" defaultValue='3' onChange={e => setSettings({...settings, init_cell_number: Number(e.target.value)})} />
-                    {/* 一定要 set 整個 state ? */}
-                    <button onClick={e => setStartGeneration(true)}>reset</button>
+
+                    <button onClick={() => (startGenerationRef.current = !startGenerationRef.current) && startPlay()}>reset</button>
                 </div>
             </section>
         </div>

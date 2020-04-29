@@ -38,7 +38,7 @@ module.exports = {
             'error',
             'always'
         ],
-        'react-hooks/exhaustive-deps': 0,
+        // 'react-hooks/exhaustive-deps': 0,
         'react/prop-types': 0
     }
 };
