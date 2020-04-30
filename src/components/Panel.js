@@ -2,15 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import {LIFE_STATE} from '../constant';
 import Cell from './Cell';
 
-const Pannel = props => {
+const printMatrix = m => m.map(ary => ary.join(',')).join('\n');
+
+const Panel = props => {
 
     const { rows, cols, update_mSec, init_cell_number, generation } = props;
 
     const checkAlive = (matrix, r, c) => {
 
-        if (!matrix[r] || !matrix[r][c]) return LIFE_STATE.DEAD;
+        if (!matrix[r] || !matrix[r][c]) return false;
 
         if ([LIFE_STATE.DEAD_TO_LIVE, LIFE_STATE.LIVE].includes(matrix[r][c])) return true;
+
+        return false;
     };
 
     const setStatusToMatrix = m => {
@@ -38,6 +42,10 @@ const Pannel = props => {
 
     // set status on mounted
     useEffect(() => {
+        console.log('rows, cols, update_mSec, init_cell_number', rows, cols, update_mSec, init_cell_number);
+
+        if (!rows || !cols || !update_mSec || !init_cell_number) return;
+
         const m = createMatrix(rows, cols);
 
         setStatusToMatrix(m);
@@ -59,30 +67,28 @@ const Pannel = props => {
         for (let i = 0; i < rows ; i++) {
             for (let j = 0; j < rows ; j++) {
 
-                let alive_neibor_number = 0;
+                let alive_neighbor_number = 0;
 
-                if (checkAlive(m, i-1, j-1)) alive_neibor_number++;
-                if (checkAlive(m, i, j-1)) alive_neibor_number++;
-                if (checkAlive(m, i+1, j-1)) alive_neibor_number++;
+                if (checkAlive(m, i-1, j-1)) alive_neighbor_number++;
+                if (checkAlive(m, i, j-1)) alive_neighbor_number++;
+                if (checkAlive(m, i+1, j-1)) alive_neighbor_number++;
 
-                if (checkAlive(m, i-1, j)) alive_neibor_number++;
-                if (checkAlive(m, i+1, j)) alive_neibor_number++;
+                if (checkAlive(m, i-1, j)) alive_neighbor_number++;
+                if (checkAlive(m, i+1, j)) alive_neighbor_number++;
 
-                if (checkAlive(m, i+1, j+1)) alive_neibor_number++;
-                if (checkAlive(m, i+1, j+1)) alive_neibor_number++;
-                if (checkAlive(m, i+1, j+1)) alive_neibor_number++;
+                if (checkAlive(m, i-1, j+1)) alive_neighbor_number++;
+                if (checkAlive(m, i, j+1)) alive_neighbor_number++;
+                if (checkAlive(m, i+1, j+1)) alive_neighbor_number++;
 
-                if (alive_neibor_number < 2 && alive_neibor_number > 3 && m[i][j] % 2) m[i][j] = LIFE_STATE.LIVE_TO_DEAD;
-                if (alive_neibor_number === 3 && !(m[i][j] % 2)) m[i][j] = LIFE_STATE.DEAD_TO_LIVE;
-                console.log(i, j, 'alive_neibor_number', alive_neibor_number);
+                if ((m[i][j] % 2) && (alive_neighbor_number < 2 || alive_neighbor_number > 3)) m[i][j] = LIFE_STATE.LIVE_TO_DEAD;
+                if (!(m[i][j] % 2) && alive_neighbor_number === 3) m[i][j] = LIFE_STATE.DEAD_TO_LIVE;
+                // console.log('m[', i, '][', j, ']', m[i][j], ' -- alive_neighbor_number', alive_neighbor_number);
             }
         }
 
         setMatrix(() => m);
 
     }, [generation]);
-
-    console.log(rows, cols, update_mSec, init_cell_number, generation, matrix);
 
     return (
         <div style={{
@@ -101,4 +107,4 @@ const Pannel = props => {
 
 };
 
-export default Pannel;
+export default Panel;

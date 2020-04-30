@@ -38,7 +38,8 @@ module.exports = {
             'error',
             'always'
         ],
-        // 'react-hooks/exhaustive-deps': 0,
-        'react/prop-types': 0
+        'react/prop-types': 0,
+        "react/jsx-uses-react": "error",
+        "react/jsx-uses-vars": "error",
     }
 };
